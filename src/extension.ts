@@ -5,6 +5,7 @@ import {
   commands,
   window,
   ViewColumn,
+  TextEditor,
   TextDocumentShowOptions,
 } from "vscode";
 
@@ -67,16 +68,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
       edit.insert(editor.selection.end, "\x1b");
     })
   );
-
-  workspace.onDidOpenTextDocument((document) => {
-        if (document.languageId === 'ansi' || document.fileName.endsWith('.ansi') || document.fileName.endsWith('.log')) {
-          if (document.uri.scheme === 'undefined.pretty') {
+  window.onDidChangeActiveTextEditor((textEditor: TextEditor | undefined) => {
+      if (textEditor?.document.languageId === 'ansi' || textEditor?.document.fileName.endsWith('.ansi') || textEditor?.document.fileName.endsWith('.log')) {
+          if (textEditor.document.uri.scheme === 'undefined.pretty') {
               return;
           }
-          const providerUri = PrettyAnsiContentProvider.toProviderUri(document.uri);
+          const providerUri = PrettyAnsiContentProvider.toProviderUri(textEditor.document.uri);
           window.showTextDocument(providerUri,  { viewColumn: ViewColumn.Active });
         }
-    });
+  });
 }
 
 export function deactivate(): void {
