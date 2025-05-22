@@ -67,6 +67,16 @@ export async function activate(context: ExtensionContext): Promise<void> {
       edit.insert(editor.selection.end, "\x1b");
     })
   );
+
+  workspace.onDidOpenTextDocument((document) => {
+        if (document.languageId === 'ansi' || document.fileName.endsWith('.ansi') || document.fileName.endsWith('.log')) {
+          if (document.uri.scheme === 'undefined.pretty') {
+              return;
+          }
+          const providerUri = PrettyAnsiContentProvider.toProviderUri(document.uri);
+          window.showTextDocument(providerUri,  { viewColumn: ViewColumn.Active });
+        }
+    });
 }
 
 export function deactivate(): void {
